@@ -1,0 +1,15 @@
+{
+  "name": "cf-worker-dead-next-server-action-block",
+  "version": "0.0.0",
+  "packageManager": "yarn@4.5.1",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.91.0"
+  }
+}
