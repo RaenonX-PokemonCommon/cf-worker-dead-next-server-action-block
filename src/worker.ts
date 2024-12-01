@@ -1,6 +1,6 @@
 export interface Env {}
 
-const deadNextServerActionHashes = new Set();
+const deadNextServerActionHashesByHost = new Map<string, Set<string>>();
 
 const generateBadNextServerActionResponse = () => new Response(
 	JSON.stringify({
@@ -19,19 +19,27 @@ export default {
 	fetch: async (request: Request, _: Env, __: ExecutionContext): Promise<Response> => {
 		const nextServerActionHeader = request.headers.get('Next-Action');
 
-		if (deadNextServerActionHashes.has(nextServerActionHeader)) {
-			console.log({
-				message: 'Dead next server action blocked',
-				deadNextServerActionHashes,
-				host: new URL(request.url).host,
-				url: request.url,
-			});
-			return generateBadNextServerActionResponse();
-		}
-
 		// If the header is not present, proceed with the request
 		if (!nextServerActionHeader) {
 			return fetch(request);
+		}
+
+		const host = new URL(request.url).host;
+
+		let deadNextServerActionHashesOfHost = deadNextServerActionHashesByHost.get(host);
+		if (!deadNextServerActionHashesOfHost) {
+			deadNextServerActionHashesOfHost = new Set<string>();
+			deadNextServerActionHashesByHost.set(host, deadNextServerActionHashesOfHost);
+		}
+
+		if (deadNextServerActionHashesOfHost.has(nextServerActionHeader)) {
+			console.log({
+				message: 'Dead next server action blocked',
+				deadNextServerActionHashes: deadNextServerActionHashesByHost,
+				host,
+				url: request.url,
+			});
+			return generateBadNextServerActionResponse();
 		}
 
 		// Fetch the response from the origin or another upstream
@@ -44,11 +52,11 @@ export default {
 		}
 
 		// Record the dead server action header
-		deadNextServerActionHashes.add(nextServerActionHeader);
+		deadNextServerActionHashesOfHost.add(nextServerActionHeader);
 		console.log({
 			message: 'New dead next server action found and added',
-			deadNextServerActionHashes,
-			host: new URL(request.url).host,
+			deadNextServerActionHashes: deadNextServerActionHashesByHost,
+			host,
 			url: request.url,
 		});
 
