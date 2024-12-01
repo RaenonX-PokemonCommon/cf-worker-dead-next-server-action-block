@@ -18,9 +18,10 @@ const generateBadNextServerActionResponse = () => new Response(
 export default {
 	fetch: async (request: Request, _: Env, __: ExecutionContext): Promise<Response> => {
 		const nextServerActionHeader = request.headers.get('Next-Action');
+		const httpMethod = request.method.toUpperCase();
 
 		// If the header is not present, proceed with the request
-		if (!nextServerActionHeader) {
+		if (!nextServerActionHeader || httpMethod !== 'POST') {
 			return fetch(request);
 		}
 
