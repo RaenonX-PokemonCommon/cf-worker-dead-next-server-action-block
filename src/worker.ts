@@ -20,6 +20,12 @@ export default {
 		const nextServerActionHeader = request.headers.get('Next-Action');
 
 		if (deadNextServerActionHashes.has(nextServerActionHeader)) {
+			console.log({
+				message: 'Dead next server action blocked',
+				deadNextServerActionHashes,
+				host: new URL(request.url).host,
+				url: request.url,
+			});
 			return generateBadNextServerActionResponse();
 		}
 
@@ -39,6 +45,12 @@ export default {
 
 		// Record the dead server action header
 		deadNextServerActionHashes.add(nextServerActionHeader);
+		console.log({
+			message: 'New dead next server action found and added',
+			deadNextServerActionHashes,
+			host: new URL(request.url).host,
+			url: request.url,
+		});
 
 		// Return an error response if the response is HTML
 		return generateBadNextServerActionResponse();
