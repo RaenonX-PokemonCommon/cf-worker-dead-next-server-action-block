@@ -36,7 +36,7 @@ export default {
 		if (deadNextServerActionHashesOfHost.has(nextServerActionHeader)) {
 			console.log({
 				message: 'Dead next server action blocked',
-				deadNextServerActionHashes: deadNextServerActionHashesByHost,
+				deadNextServerActionHashesByHost: JSON.stringify(deadNextServerActionHashesByHost),
 				host,
 				url: request.url,
 			});
@@ -56,7 +56,7 @@ export default {
 		deadNextServerActionHashesOfHost.add(nextServerActionHeader);
 		console.log({
 			message: 'New dead next server action found and added',
-			deadNextServerActionHashes: deadNextServerActionHashesByHost,
+			deadNextServerActionHashesByHost: JSON.stringify(deadNextServerActionHashesByHost),
 			host,
 			url: request.url,
 		});
